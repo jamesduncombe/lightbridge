@@ -22,7 +22,8 @@ defmodule Lightbridge.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:tortoise, "~> 0.9.4"}
+      {:tortoise, "~> 0.9.4"},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false}
     ]
   end
 end

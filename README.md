@@ -1,21 +1,12 @@
 # Lightbridge
 
-**TODO: Add description**
+Lightbridge handles the bridge between MQTT and the TPLink HS100/HS110's protocol.
+
+One of these: https://www.tp-link.com/uk/home-networking/smart-plug/hs110
+
+Currently this only turns the socket on or off but the Hs100 module has additional functionality.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `lightbridge` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:lightbridge, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/lightbridge](https://hexdocs.pm/lightbridge).
+Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc).
 
