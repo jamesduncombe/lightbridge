@@ -9,4 +9,6 @@ config :lightbridge,
   mqtt_port: 0,
   # Credentials for the MQTT server
   mqtt_username: "",
-  mqtt_password: ""
+  mqtt_password: "",
+  # Base MQTT topic for the switch
+  mqtt_topic: "home/room/switch"

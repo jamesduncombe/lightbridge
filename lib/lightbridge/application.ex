@@ -7,8 +7,7 @@ defmodule Lightbridge.Application do
 
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Lightbridge.Worker.start_link(arg)
-      # {Lightbridge.Worker, arg}
+      Lightbridge.Mqtt
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
