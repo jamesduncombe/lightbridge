@@ -7,7 +7,8 @@ defmodule Lightbridge.Application do
 
   def start(_type, _args) do
     children = [
-      Lightbridge.Mqtt
+      Lightbridge.Mqtt,
+      Lightbridge.EnergyMonitor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

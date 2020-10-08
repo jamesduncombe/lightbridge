@@ -15,3 +15,5 @@ config :lightbridge,
   mqtt_password: "",
   # Base MQTT topic for the switch
   mqtt_topic: "home/room/switch"
+  # Energy topic
+  mqtt_energy_topic: "home/room/switch/energy"
