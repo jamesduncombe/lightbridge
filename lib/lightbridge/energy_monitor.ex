@@ -22,13 +22,25 @@ defmodule Lightbridge.EnergyMonitor do
   end
 
   def poll do
-    Hs100.get_energy()
-    |> parse_energy_stats()
-    |> Enum.each(fn {path, stat} ->
-      Tortoise.publish(mqtt_client_id(), "#{mqtt_energy_topic()}/#{path}", to_string(stat), qos: 0)
-    end)
+    # Get the energy stats
+    # Parse them into a suitable structure
+    # Batch them up into async tasks
+    # TODO: This seems quite tightly coupled together...
+    tasks =
+      Hs100.get_energy()
+      |> parse_energy_stats()
+      |> Enum.map(fn {path, stat} ->
+        Task.async(
+          Tortoise,
+          :publish,
+          [mqtt_client_id(), "#{mqtt_energy_topic()}/#{path}", to_string(stat), [qos: 0]]
+        )
+      end)
 
-    # Send back a poll message after `@poll_frequency` seconds
+    # Asyncly fire these off to the MQTT server
+    Task.await_many(tasks, _wait_for = 2_000)
+
+    # Poll ourselves in `@poll_frequency` seconds
     Process.send_after(self(), :poll, @poll_frequency)
   end
 
