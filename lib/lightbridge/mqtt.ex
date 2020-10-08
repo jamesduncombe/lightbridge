@@ -14,15 +14,19 @@ defmodule Lightbridge.Mqtt do
   def init(_args) do
     {ok, pid} =
       Tortoise.Connection.start_link(
-        client_id: Hs100,
+        client_id: mqtt_client_id(),
         user_name: mqtt_username(),
         password: mqtt_password(),
         server: {Tortoise.Transport.Tcp, host: mqtt_host(), port: mqtt_port()},
         handler: {MqttHandler, []}
       )
 
-    Tortoise.Connection.subscribe(Hs100, mqtt_topic(), qos: 0)
+    Tortoise.Connection.subscribe(mqtt_client_id(), mqtt_topic(), qos: 0)
     {:ok, pid}
+  end
+
+  defp mqtt_client_id() do
+    Application.fetch_env!(:lightbridge, :mqtt_client_id)
   end
 
   defp mqtt_username do

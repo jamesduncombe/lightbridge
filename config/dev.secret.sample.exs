@@ -4,6 +4,8 @@ config :lightbridge,
   sender_implementation: Lightbridge.Hs100.TcpSender,
   # IP of the HS100
   hs100_ip: {0, 0, 0, 0},
+  # ClientID for MQTT
+  mqtt_client_id: :iam_client,
   # MQTT hostname
   mqtt_host: "",
   # Port of the MQTT server
