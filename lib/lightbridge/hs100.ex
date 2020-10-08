@@ -1,6 +1,6 @@
 defmodule Lightbridge.Hs100 do
   @moduledoc """
-  Handles the commands to the Hs100.
+  Handles both the available commands to the HS100/110 and encryption/decryption.
   """
 
   use Bitwise
@@ -54,7 +54,6 @@ defmodule Lightbridge.Hs100 do
     |> send_cmd()
   end
 
-  # TODO: Add proper return from a relay switch
   @doc """
   Sends the `cmd` to the HS100/110.
   """
@@ -64,14 +63,14 @@ defmodule Lightbridge.Hs100 do
       cmd
       |> encrypt()
 
-    {:ok, sock} = :gen_tcp.connect(hs100_ip(), 9999, [:binary, {:packet, 0}, {:active, false}])
+    case sender().send_cmd(encrypted) do
+      {:encrypted, data} ->
+        data
+        |> decrypt()
 
-    :ok = :gen_tcp.send(sock, encrypted)
-    {:ok, data} = :gen_tcp.recv(sock, _all_please = 0)
-    :ok = :gen_tcp.close(sock)
-
-    data
-    |> decrypt()
+      {_, data} ->
+        data
+    end
   end
 
   @doc """
@@ -116,7 +115,7 @@ defmodule Lightbridge.Hs100 do
     do_decrypt_payload(rest, accm ++ [slam], next_key)
   end
 
-  defp hs100_ip() do
-    Application.fetch_env!(:lightbridge, :hs100_ip)
+  defp sender() do
+    Application.fetch_env!(:lightbridge, :sender_implementation)
   end
 end

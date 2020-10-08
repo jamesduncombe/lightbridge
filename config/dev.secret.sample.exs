@@ -1,6 +1,7 @@
 import Config
 
 config :lightbridge,
+  sender_implementation: Lightbridge.Hs100.TcpSender,
   # IP of the HS100
   hs100_ip: {0, 0, 0, 0},
   # MQTT hostname
