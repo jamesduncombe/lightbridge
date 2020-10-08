@@ -9,12 +9,12 @@ defmodule Lightbridge.MqttHandler do
 
   @behaviour Tortoise.Handler
 
-  def init(args) do
+  def init(_args) do
     {:ok, nil}
   end
 
   def connection(status, state) do
-    Logger.info("#{status}, #{state}")
+    Logger.warn("Connection status: #{inspect(status)}")
     {:ok, state}
   end
 
@@ -23,19 +23,19 @@ defmodule Lightbridge.MqttHandler do
     {:ok, state}
   end
 
-  def terminate(reason, state) do
-    Logger.info("#{inspect(reason)}, #{state}")
+  def terminate(reason, _state) do
+    Logger.info(inspect(reason))
   end
 
   # Message handlers
 
-  def handle_message(topic, _payload = "0", state) do
+  def handle_message(_topic, _payload = "0", state) do
     Logger.info("Turning light off")
     Hs100.turn_off()
     {:ok, state}
   end
 
-  def handle_message(topic, _payload = "1", state) do
+  def handle_message(_topic, _payload = "1", state) do
     Logger.info("Turning light on")
     Hs100.turn_on()
     {:ok, state}
