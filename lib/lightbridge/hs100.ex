@@ -9,6 +9,9 @@ defmodule Lightbridge.Hs100 do
   # SEE:https://www.softscheck.com/en/reverse-engineering-tp-link-hs110/#TP-Link%20Device%20Debug%20Protocol
   @encryption_key 0xAB
 
+  # Adapter to use to send
+  use Lightbridge.Hs100.Sender
+
   @doc """
   Gets the time from the switch.
   """
@@ -63,7 +66,7 @@ defmodule Lightbridge.Hs100 do
       cmd
       |> encrypt()
 
-    case sender().send_cmd(encrypted) do
+    case @adapter.send_cmd(encrypted) do
       {:encrypted, data} ->
         data
         |> decrypt()
@@ -113,9 +116,5 @@ defmodule Lightbridge.Hs100 do
     next_key = byte
     slam = bxor(key, byte)
     do_decrypt_payload(rest, accm ++ [slam], next_key)
-  end
-
-  defp sender() do
-    Application.fetch_env!(:lightbridge, :sender_implementation)
   end
 end

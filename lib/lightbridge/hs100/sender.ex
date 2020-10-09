@@ -7,4 +7,16 @@ defmodule Lightbridge.Hs100.Sender do
 
   # TODO: Add proper return from a relay switch
   @callback send_cmd(hs100_command()) :: {atom(), any()}
+
+  defmacro __using__(_opts) do
+    quote do
+      adapter = Application.get_env(:lightbridge, :sender_implementation, nil)
+
+      unless adapter do
+        raise ArgumentError, "missing :sender_implementation key in config"
+      end
+
+      @adapter adapter
+    end
+  end
 end
