@@ -1,29 +1,33 @@
-defmodule Lightbridge.Mqtt do
+defmodule Lightbridge.MqttSupervisor do
   @moduledoc """
   Handles connection to MQTT broker.
   """
 
-  use GenServer
+  use Supervisor
 
   alias Lightbridge.MqttHandler
 
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   def init(_args) do
-    {ok, pid} =
-      Tortoise.Connection.start_link(
-        client_id: mqtt_client_id(),
-        user_name: mqtt_username(),
-        password: mqtt_password(),
-        server: {Tortoise.Transport.Tcp, host: mqtt_host(), port: mqtt_port()},
-        handler: {MqttHandler, []}
-      )
+    children = [
+      {Tortoise.Connection,
+       [
+         client_id: mqtt_client_id(),
+         user_name: mqtt_username(),
+         password: mqtt_password(),
+         server: {Tortoise.Transport.Tcp, host: mqtt_host(), port: mqtt_port()},
+         handler: {MqttHandler, []},
+         subscriptions: [{mqtt_topic(), _qos = 0}]
+       ]}
+    ]
 
-    Tortoise.Connection.subscribe(mqtt_client_id(), mqtt_topic(), qos: 0)
-    {:ok, pid}
+    Supervisor.init(children, strategy: :one_for_one)
   end
+
+  # Get config
 
   defp mqtt_client_id() do
     Application.fetch_env!(:lightbridge, :mqtt_client_id)

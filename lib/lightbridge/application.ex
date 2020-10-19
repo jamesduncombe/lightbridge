@@ -7,7 +7,7 @@ defmodule Lightbridge.Application do
 
   def start(_type, _args) do
     children = [
-      Lightbridge.Mqtt,
+      Lightbridge.MqttSupervisor,
       Lightbridge.EnergyMonitor
     ]
 
