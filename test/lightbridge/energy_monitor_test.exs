@@ -12,8 +12,8 @@ defmodule Lightbridge.EnergyMonitorTest do
         raw_json
         |> EnergyMonitor.parse_energy_stats()
 
-      assert parsed_stats["current_ma"] == 46
-      assert parsed_stats["power_mw"] == 5715
+      assert parsed_stats.current_ma == 46
+      assert parsed_stats.power_mw == 5715
     end
   end
 end

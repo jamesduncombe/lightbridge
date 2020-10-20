@@ -10,6 +10,7 @@ defmodule Lightbridge.EnergyMonitor do
   import Lightbridge.Config, only: [fetch: 1]
 
   alias Lightbridge.Hs100
+  alias Lightbridge.EnergyMonitor.Stats
 
   # Set the polling frequency for energy stats
   @poll_frequency 15 * 1_000
@@ -35,6 +36,7 @@ defmodule Lightbridge.EnergyMonitor do
     tasks =
       Hs100.get_energy()
       |> parse_energy_stats()
+      |> Map.from_struct()
       |> Enum.map(fn {path, stat} ->
         Task.async(
           Tortoise,
@@ -45,13 +47,13 @@ defmodule Lightbridge.EnergyMonitor do
 
     # Asyncly fire these off to the MQTT server
     Task.await_many(tasks, _wait_for = 2_000)
-
-    # Poll ourselves in `@poll_frequency` seconds
-    Process.send_after(self(), :poll, @poll_frequency)
   end
 
   def handle_info(:poll, %{client_id: client_id, energy_topic: energy_topic} = state) do
     poll(client_id, energy_topic)
+
+    # Poll ourselves in `@poll_frequency` seconds
+    Process.send_after(self(), :poll, @poll_frequency)
     {:noreply, state}
   end
 
@@ -63,9 +65,48 @@ defmodule Lightbridge.EnergyMonitor do
     # Split the values into their own topics
     {:ok, parsed_energy_stats} =
       stats
-      |> Jason.decode()
+      |> Jason.decode(keys: :atoms)
 
     # Get the stats from the nested structure
-    get_in(parsed_energy_stats, ["emeter", "get_realtime"])
+    parsed_energy_stats
+    |> get_in([:emeter, :get_realtime])
+    |> Stats.new()
+  end
+
+  defmodule Stats do
+    @moduledoc """
+    Stats encapsulates the data coming back from the smart socket.
+    """
+    defstruct current_ma: 0, err_code: 0, power_mw: 0, total_wh: 0, voltage_mv: 0
+
+    @typedoc """
+    Represents the Stats struct.
+    """
+    @type t :: %__MODULE__{
+            current_ma: pos_integer(),
+            err_code: integer(),
+            power_mw: pos_integer(),
+            total_wh: pos_integer(),
+            voltage_mv: pos_integer()
+          }
+
+    @doc """
+    Takes in a map of energy stats and returns a new `t()`.
+    """
+    @spec new(energy_stats :: map()) :: t()
+    def new(energy_stats) do
+      struct(__MODULE__, energy_stats)
+    end
+  end
+
+  defimpl String.Chars, for: Stats do
+    def to_string(energy_stats) do
+      ~s"""
+      Power (mW): #{energy_stats.power_mw}
+      Voltage (mV): #{energy_stats.voltage_mv}
+      Current (mA): #{energy_stats.current_ma}
+      Total WH: #{energy_stats.total_wh}
+      """
+    end
   end
 end
