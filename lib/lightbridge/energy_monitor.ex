@@ -7,6 +7,8 @@ defmodule Lightbridge.EnergyMonitor do
 
   use GenServer
 
+  import Lightbridge.Config, only: [fetch: 1]
+
   alias Lightbridge.Hs100
 
   # Set the polling frequency for energy stats
@@ -18,10 +20,14 @@ defmodule Lightbridge.EnergyMonitor do
 
   def init(_args) do
     Process.send_after(self(), :poll, @poll_frequency)
-    {:ok, nil}
+    {:ok, %{client_id: fetch(:mqtt_client_id), energy_topic: fetch(:mqtt_energy_topic)}}
   end
 
-  def poll do
+  @doc """
+  Polls the energy stats then sends them up to the MQTT broker.
+  """
+  @spec poll(client_id :: String.t(), energy_topic :: String.t()) :: nil
+  def poll(client_id, energy_topic) do
     # Get the energy stats
     # Parse them into a suitable structure
     # Batch them up into async tasks
@@ -33,7 +39,7 @@ defmodule Lightbridge.EnergyMonitor do
         Task.async(
           Tortoise,
           :publish,
-          [mqtt_client_id(), "#{mqtt_energy_topic()}/#{path}", to_string(stat), [qos: 0]]
+          [client_id, "#{energy_topic}/#{path}", to_string(stat), [qos: 0]]
         )
       end)
 
@@ -44,8 +50,8 @@ defmodule Lightbridge.EnergyMonitor do
     Process.send_after(self(), :poll, @poll_frequency)
   end
 
-  def handle_info(:poll, state) do
-    poll()
+  def handle_info(:poll, %{client_id: client_id, energy_topic: energy_topic} = state) do
+    poll(client_id, energy_topic)
     {:noreply, state}
   end
 
@@ -59,15 +65,7 @@ defmodule Lightbridge.EnergyMonitor do
       stats
       |> Jason.decode()
 
-    # Get the stats from the nest structure
+    # Get the stats from the nested structure
     get_in(parsed_energy_stats, ["emeter", "get_realtime"])
-  end
-
-  defp mqtt_client_id() do
-    Application.fetch_env!(:lightbridge, :mqtt_client_id)
-  end
-
-  defp mqtt_energy_topic() do
-    Application.fetch_env!(:lightbridge, :mqtt_energy_topic)
   end
 end
