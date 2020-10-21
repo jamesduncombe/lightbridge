@@ -15,7 +15,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the time from the switch.
   """
-  @spec get_time :: nil
+  @spec get_time :: binary()
   def get_time() do
     ~s({"time":{"get_time":null}})
     |> send_cmd()
@@ -24,7 +24,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the info from the switch.
   """
-  @spec get_sysinfo :: nil
+  @spec get_sysinfo :: binary()
   def get_sysinfo() do
     ~s({"system":{"get_sysinfo":null}})
     |> send_cmd()
@@ -33,7 +33,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the current energy usage of the switch.
   """
-  @spec get_energy :: nil
+  @spec get_energy :: binary()
   def get_energy() do
     ~s({"emeter":{"get_realtime":{}}})
     |> send_cmd()
@@ -42,7 +42,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Turns on the relay.
   """
-  @spec turn_on :: nil
+  @spec turn_on :: binary()
   def turn_on() do
     ~s({"system":{"set_relay_state":{"state":1}}})
     |> send_cmd()
@@ -51,7 +51,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Turns off the relay.
   """
-  @spec turn_off :: nil
+  @spec turn_off :: binary()
   def turn_off() do
     ~s({"system":{"set_relay_state":{"state":0}}})
     |> send_cmd()
