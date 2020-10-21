@@ -27,7 +27,7 @@ defmodule Lightbridge.EnergyMonitor do
   @doc """
   Polls the energy stats then sends them up to the MQTT broker.
   """
-  @spec poll(client_id :: String.t(), energy_topic :: String.t()) :: nil
+  @spec poll(client_id :: String.t(), energy_topic :: String.t()) :: any()
   def poll(client_id, energy_topic) do
     # Get the energy stats
     # Parse them into a suitable structure

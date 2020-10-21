@@ -9,7 +9,12 @@ defmodule Lightbridge.Hs100.Sender do
   @doc """
   Sends a command to the HS100/110.
   """
-  @callback send_cmd(hs100_command()) :: {atom(), any()}
+  @callback send_cmd(hs100_command()) :: any()
+
+  @doc """
+  Processes the response back from the sent command.
+  """
+  @callback process_response(any()) :: String.t()
 
   defmacro __using__(_opts) do
     quote do

@@ -67,7 +67,7 @@ defmodule Lightbridge.Hs100Test do
         |> Base.decode16!(case: :lower)
         |> Hs100.decrypt()
 
-      assert decrypted == '{"system":{"set_relay_state":{"state":1}}}'
+      assert decrypted == ~s({"system":{"set_relay_state":{"state":1}}})
     end
   end
 end

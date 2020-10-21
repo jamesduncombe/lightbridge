@@ -5,7 +5,13 @@ defmodule Lightbridge.Hs100.MockSender do
 
   @behaviour Lightbridge.Hs100.Sender
 
+  @impl true
   def send_cmd(cmd) do
-    {:notencrypted, cmd}
+    cmd
+  end
+
+  @impl true
+  def process_response(response) do
+    response
   end
 end

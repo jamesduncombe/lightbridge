@@ -24,6 +24,7 @@ defmodule Lightbridge.MixProject do
     [
       {:tortoise, "~> 0.9.4"},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:jason, "~> 1.2"}
     ]
   end

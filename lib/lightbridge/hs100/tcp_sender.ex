@@ -5,6 +5,9 @@ defmodule Lightbridge.Hs100.TcpSender do
 
   @behaviour Lightbridge.Hs100.Sender
 
+  import Lightbridge.Hs100, only: [decrypt: 1]
+
+  @impl true
   def send_cmd(cmd) do
     {:ok, sock} =
       :gen_tcp.connect(hs100_ip(), _port = 9999, [:binary, {:packet, 0}, {:active, false}])
@@ -13,7 +16,13 @@ defmodule Lightbridge.Hs100.TcpSender do
     {:ok, data} = :gen_tcp.recv(sock, _all_please = 0)
     :ok = :gen_tcp.close(sock)
 
-    {:encrypted, data}
+    data
+  end
+
+  @impl true
+  def process_response(response) do
+    response
+    |> decrypt()
   end
 
   defp hs100_ip() do

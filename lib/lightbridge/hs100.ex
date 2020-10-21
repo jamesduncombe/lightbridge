@@ -15,7 +15,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the time from the switch.
   """
-  @spec get_time :: binary()
+  @spec get_time :: String.t()
   def get_time() do
     ~s({"time":{"get_time":null}})
     |> send_cmd()
@@ -24,7 +24,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the info from the switch.
   """
-  @spec get_sysinfo :: binary()
+  @spec get_sysinfo :: String.t()
   def get_sysinfo() do
     ~s({"system":{"get_sysinfo":null}})
     |> send_cmd()
@@ -33,7 +33,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Gets the current energy usage of the switch.
   """
-  @spec get_energy :: binary()
+  @spec get_energy :: String.t()
   def get_energy() do
     ~s({"emeter":{"get_realtime":{}}})
     |> send_cmd()
@@ -42,7 +42,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Turns on the relay.
   """
-  @spec turn_on :: binary()
+  @spec turn_on :: String.t()
   def turn_on() do
     ~s({"system":{"set_relay_state":{"state":1}}})
     |> send_cmd()
@@ -51,7 +51,7 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Turns off the relay.
   """
-  @spec turn_off :: binary()
+  @spec turn_off :: String.t()
   def turn_off() do
     ~s({"system":{"set_relay_state":{"state":0}}})
     |> send_cmd()
@@ -60,24 +60,16 @@ defmodule Lightbridge.Hs100 do
   @doc """
   Sends the `cmd` to the HS100/110.
   """
-  @spec send_cmd(cmd :: String.t()) :: binary()
+  @spec send_cmd(cmd :: String.t()) :: String.t()
   def send_cmd(cmd) do
-    encrypted =
-      cmd
-      |> encrypt()
-
-    case @adapter.send_cmd(encrypted) do
-      {:encrypted, data} ->
-        data
-        |> decrypt()
-
-      {_, data} ->
-        data
-    end
+    cmd
+    |> encrypt()
+    |> @adapter.send_cmd()
+    |> @adapter.process_response()
   end
 
   @doc """
-  Handles encrypting commands to HS100.
+  Handles encrypting commands.
   """
   @spec encrypt(cmd :: String.t()) :: list()
   def encrypt(cmd) do
@@ -99,9 +91,9 @@ defmodule Lightbridge.Hs100 do
   end
 
   @doc """
-  Handles decrypting commands from HS100.
+  Handles decrypting commands.
   """
-  @spec decrypt(ciphertext :: binary()) :: String.t()
+  @spec decrypt(ciphertext :: String.t()) :: String.t()
   def decrypt(ciphertext) do
     # Ignore the first 4 bytes as that's the length of the ciphertext (uint32)
     <<_, _, _, _, rest::binary>> = ciphertext
@@ -110,7 +102,7 @@ defmodule Lightbridge.Hs100 do
     do_decrypt_payload(rest, _accm = [], @encryption_key)
   end
 
-  defp do_decrypt_payload(<<>>, accm, _key), do: accm
+  defp do_decrypt_payload(<<>>, accm, _key), do: to_string(accm)
 
   defp do_decrypt_payload(<<byte, rest::binary>>, accm, key) do
     next_key = byte
