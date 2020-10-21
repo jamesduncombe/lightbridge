@@ -3,36 +3,6 @@ defmodule Lightbridge.Hs100Test do
 
   alias Lightbridge.Hs100
 
-  describe "get_time/0" do
-    test "gets time" do
-      Hs100.get_time()
-    end
-  end
-
-  describe "get_sysinfo/0" do
-    test "gets system info" do
-      Hs100.get_sysinfo()
-    end
-  end
-
-  describe "" do
-    test "gets live energy usage" do
-      Hs100.get_energy()
-    end
-  end
-
-  describe "turn_on/0" do
-    test "turns on the switch" do
-      Hs100.turn_on()
-    end
-  end
-
-  describe "turn_off/0" do
-    test "turns off the switch" do
-      Hs100.turn_off()
-    end
-  end
-
   describe "encrypt/1" do
     test "encrypts the command to send to the switch" do
       command = ~s({"system":{"set_relay_state":{"state":1}}})
