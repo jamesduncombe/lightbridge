@@ -1,8 +1,11 @@
-defmodule Lightbridge.Hs100.Sender do
+defmodule Lightbridge.Transport do
   @moduledoc """
   Define the sender behaviour.
   """
 
+  @typedoc """
+  An HS100/110 command.
+  """
   @type hs100_command :: String.t()
 
   # TODO: Add proper return from a relay switch

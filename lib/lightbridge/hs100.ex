@@ -10,7 +10,7 @@ defmodule Lightbridge.Hs100 do
   @encryption_key 0xAB
 
   # Adapter to use to send
-  use Lightbridge.Hs100.Sender
+  use Lightbridge.Transport
 
   @doc """
   Gets the time from the switch.

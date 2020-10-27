@@ -1,9 +1,9 @@
-defmodule Lightbridge.Hs100.TcpSender do
+defmodule Lightbridge.Transport.Tcp do
   @moduledoc """
   Sends requests to the HS100/110 over the network.
   """
 
-  @behaviour Lightbridge.Hs100.Sender
+  @behaviour Lightbridge.Transport
 
   import Lightbridge.Hs100, only: [decrypt: 1]
 

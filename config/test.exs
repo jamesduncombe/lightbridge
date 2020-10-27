@@ -1,7 +1,7 @@
 import Config
 
 config :lightbridge,
-  sender_implementation: Lightbridge.Hs100.MockSender,
+  sender_implementation: Lightbridge.Transport.Mock,
   hs100_ip: {127, 0, 0, 1},
   mqtt_client_id: :mqtt_client,
   mqtt_host: "",

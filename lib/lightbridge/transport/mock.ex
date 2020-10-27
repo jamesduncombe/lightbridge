@@ -1,9 +1,9 @@
-defmodule Lightbridge.Hs100.MockSender do
+defmodule Lightbridge.Transport.Mock do
   @moduledoc """
   Simply echos whatever command it receives for testing.
   """
 
-  @behaviour Lightbridge.Hs100.Sender
+  @behaviour Lightbridge.Transport
 
   @impl true
   def send_cmd(cmd) do
