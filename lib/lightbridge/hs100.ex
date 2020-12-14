@@ -12,21 +12,17 @@ defmodule Lightbridge.Hs100 do
   # Adapter to use to send
   use Lightbridge.Transport
 
-  @commands [
-    {:get_time, ~s({"time":{"get_time":null}}), "Gets the time"},
-    {:get_sysinfo, ~s({"system":{"get_sysinfo":null}}), "Gets the system info"},
-    {:get_energy, ~s({"emeter":{"get_realtime":{}}}), "Gets the current energy usage"},
-    {:turn_on, ~s({"system":{"set_relay_state":{"state":1}}}), "Turns on the switch"},
-    {:turn_off, ~s({"system":{"set_relay_state":{"state":0}}}), "Turns off the switch"}
-  ]
+  @external_resource funs = Path.join([__DIR__, "../../", "commands.txt"])
+  @commands (for line <- File.stream!(funs, [], :line) do
+               [func, command] =
+                 line
+                 |> String.trim()
+                 |> String.split(",", parts: 2)
 
-  for {command, payload, what_it_does} <- @commands do
-    Module.put_attribute(
-      __MODULE__,
-      :doc,
-      {__ENV__.line(), "#{what_it_does}."}
-    )
+               {String.to_atom(func), command}
+             end)
 
+  for {command, payload} <- @commands do
     def unquote(command)(), do: unquote(payload) |> send_cmd()
   end
 

@@ -1,0 +1,5 @@
+get_time, {"time":{"get_time":null}}
+get_sysinfo, {"system":{"get_sysinfo":null}}
+get_energy, {"emeter":{"get_realtime":{}}}
+turn_on, {"system":{"set_relay_state":{"state":1}}}
+turn_off, {"system":{"set_relay_state":{"state":0}}}
