@@ -86,8 +86,8 @@ defmodule Lightbridge.Hs100 do
   defp do_encrypt_payload(<<>>, accm, _key), do: accm
 
   defp do_encrypt_payload(<<byte, rest::binary>>, accm, key) do
-    slam = bxor(key, byte)
-    do_encrypt_payload(rest, accm ++ [slam], slam)
+    xord_val = bxor(key, byte)
+    do_encrypt_payload(rest, accm ++ [xord_val], xord_val)
   end
 
   @doc """
@@ -106,7 +106,7 @@ defmodule Lightbridge.Hs100 do
 
   defp do_decrypt_payload(<<byte, rest::binary>>, accm, key) do
     next_key = byte
-    slam = bxor(key, byte)
-    do_decrypt_payload(rest, accm ++ [slam], next_key)
+    xord_val = bxor(key, byte)
+    do_decrypt_payload(rest, accm ++ [xord_val], next_key)
   end
 end
