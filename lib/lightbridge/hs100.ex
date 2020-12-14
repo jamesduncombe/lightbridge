@@ -12,49 +12,22 @@ defmodule Lightbridge.Hs100 do
   # Adapter to use to send
   use Lightbridge.Transport
 
-  @doc """
-  Gets the time from the switch.
-  """
-  @spec get_time :: String.t()
-  def get_time() do
-    ~s({"time":{"get_time":null}})
-    |> send_cmd()
-  end
+  @commands [
+    {:get_time, ~s({"time":{"get_time":null}}), "Gets the time"},
+    {:get_sysinfo, ~s({"system":{"get_sysinfo":null}}), "Gets the system info"},
+    {:get_energy, ~s({"emeter":{"get_realtime":{}}}), "Gets the current energy usage"},
+    {:turn_on, ~s({"system":{"set_relay_state":{"state":1}}}), "Turns on the switch"},
+    {:turn_off, ~s({"system":{"set_relay_state":{"state":0}}}), "Turns off the switch"}
+  ]
 
-  @doc """
-  Gets the info from the switch.
-  """
-  @spec get_sysinfo :: String.t()
-  def get_sysinfo() do
-    ~s({"system":{"get_sysinfo":null}})
-    |> send_cmd()
-  end
+  for {command, payload, what_it_does} <- @commands do
+    Module.put_attribute(
+      __MODULE__,
+      :doc,
+      {__ENV__.line(), "#{what_it_does}."}
+    )
 
-  @doc """
-  Gets the current energy usage of the switch.
-  """
-  @spec get_energy :: String.t()
-  def get_energy() do
-    ~s({"emeter":{"get_realtime":{}}})
-    |> send_cmd()
-  end
-
-  @doc """
-  Turns on the relay.
-  """
-  @spec turn_on :: String.t()
-  def turn_on() do
-    ~s({"system":{"set_relay_state":{"state":1}}})
-    |> send_cmd()
-  end
-
-  @doc """
-  Turns off the relay.
-  """
-  @spec turn_off :: String.t()
-  def turn_off() do
-    ~s({"system":{"set_relay_state":{"state":0}}})
-    |> send_cmd()
+    def unquote(command)(), do: unquote(payload) |> send_cmd()
   end
 
   @doc """
